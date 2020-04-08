@@ -9,12 +9,18 @@ import { Place } from '../places.model';
 })
 export class DiscoverPage implements OnInit {
 
-  loadedPlaces: Place[]
+  loadedPlaces: Place[];
+  listedLoadedPlaces: Place[];
 
   constructor(private _placesService: PlacesService) { }
 
   ngOnInit() {
     this.loadedPlaces = this._placesService.places;
+    this.listedLoadedPlaces = this.loadedPlaces.slice(1);
+  }
+
+  onFilterUpdate(event: CustomEvent) {
+    console.log(event.detail);
   }
 
 }
