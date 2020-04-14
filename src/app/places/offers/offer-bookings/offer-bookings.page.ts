@@ -12,6 +12,7 @@ import { Subscription } from 'rxjs';
 })
 export class OfferBookingsPage implements OnInit {
 
+  placeId: string;
   place: Place;
   private placesSub: Subscription
 
@@ -22,6 +23,7 @@ export class OfferBookingsPage implements OnInit {
       if (!p.has('placeId')) {
         this._navCtlr.navigateBack('/places/tabs/offers');
       }
+      this.placeId = p.get('placeId');
       this.placesSub = this._placeService.getPlace(p.get('placeId')).subscribe(p => {
         this.place = p;
       });

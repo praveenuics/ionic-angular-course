@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { PlacesService } from '../places.service';
 import { Place } from '../places.model';
 import { Subscription } from 'rxjs';
-import { AuthService } from 'src/app/auth/auth.service';
+import { AuthService } from '../../auth/auth.service';
 
 @Component({
   selector: 'app-discover',
@@ -15,6 +15,7 @@ export class DiscoverPage implements OnInit, OnDestroy {
   listedLoadedPlaces: Place[];
   relevantPlaces: Place[];
   private placesSub: Subscription;
+  public isLoading = false;
 
   constructor(private _placesService: PlacesService, private _authService: AuthService) { }
 
@@ -23,6 +24,13 @@ export class DiscoverPage implements OnInit, OnDestroy {
       this.loadedPlaces = p;
       this.listedLoadedPlaces = this.loadedPlaces.slice(1);
       this.relevantPlaces = this.loadedPlaces;
+    });
+  }
+
+  ionViewWillEnter() {
+    this.isLoading = true;
+    this._placesService.fetchPlaces().subscribe(args => {
+      this.isLoading = false;
     });
   }
 

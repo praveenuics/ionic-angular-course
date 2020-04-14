@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
-import { NavController, ModalController, ActionSheetController, LoadingController } from '@ionic/angular';
+import { ActivatedRoute, Router } from '@angular/router';
+import { NavController, ModalController, ActionSheetController, LoadingController, AlertController } from '@ionic/angular';
 import { PlacesService } from '../../places.service';
 import { Place } from '../../places.model';
 import { CreateBookingComponent } from '../../../bookings/create-booking/create-booking.component';
@@ -17,8 +17,9 @@ export class PlaceDetailPage implements OnInit {
   place: Place;
   isBookable = false;
   private placesSub: Subscription;
+  isLoading = false;
 
-  constructor(private _authService: AuthService, private _loadingCtlr: LoadingController, private _bookingService: BookingsService, private _modalCtrl: ModalController, private _actionSheetCtrl: ActionSheetController, private _navCtrl: NavController, private _activatedRoute: ActivatedRoute, private _placeService: PlacesService) { }
+  constructor(private _router: Router, private _alertCtrl: AlertController, private _authService: AuthService, private _loadingCtlr: LoadingController, private _bookingService: BookingsService, private _modalCtrl: ModalController, private _actionSheetCtrl: ActionSheetController, private _navCtrl: NavController, private _activatedRoute: ActivatedRoute, private _placeService: PlacesService) { }
 
   ngOnInit() {
     this._activatedRoute.paramMap.subscribe(p => {
@@ -26,9 +27,23 @@ export class PlaceDetailPage implements OnInit {
         this._navCtrl.navigateBack('/places/tabs/discover');
       }
 
+      this.isLoading = true;
       this.placesSub = this._placeService.getPlace(p.get('placeId')).subscribe(p => {
         this.place = p;
         this.isBookable = p.userId !== this._authService.userId;
+        this.isLoading = false;
+      }, err => {
+        this._alertCtrl.create({
+          header: 'An error occurred', message: 'Could not load place.', buttons: [
+            {
+              text: 'Okay', handler: () => {
+                this._router.navigate(['/places/tabs/discover']);
+              }
+            }
+          ]
+        }).then(el => {
+          el.present();
+        })
       });
     });
   }
